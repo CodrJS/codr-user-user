@@ -1,77 +1,41 @@
-# Kafka Micro-Service Template
+# Codr User Serivce
+
+[![CodeQL](https://github.com/CodrJS/codr-user-user/actions/workflows/codeql.yml/badge.svg)](https://github.com/CodrJS/codr-user-user/actions/workflows/codeql.yml)
+[![Docker Image CI](https://github.com/CodrJS/codr-user-user/actions/workflows/docker-image.yml/badge.svg)](https://github.com/CodrJS/codr-user-user/actions/workflows/docker-image.yml)
+
+## Purpose
+
+This microservice provides CRUD operations for the User entity.
 
 ## Getting Started
 
-Click "Use this template" in Github, then "Create a new repository."
+To use this image, pull this image from the [Github Container Registry](https://github.com/CodrJS/codr-user-user/pkgs/container/codr-user-user).
 
-## Kafka
-
-Custom built consumer and producer classes can be imported from `@codrjs/kafka`.
-
-### Creating a producer
-
-```ts
-import { Producer } from "@codrjs/kafka";
-
-// this should be imported from "@codrjs/models"
-interface TestMessage {
-  hello: "world";
-}
-
-const Topic = "test-topic";
-const TestProducer = new Producer<TestMessage>(Topic);
-
-export default TestProducer;
+```bash
+docker pull ghcr.io/codrjs/codr-user-user:latest
 ```
 
-### Creating a consumer
+### Producers
 
-```ts
-import type { KafkaMessage } from "kafkajs";
-import { Consumer } from "@codrjs/kafka";
+- [x] `codr.event.user.user` - used for audit and notification purposes.
 
-import dotenv from "dotenv";
-dotenv.config();
+### Consumers
 
-// this should be imported from "@codrjs/models"
-interface TestMessage {
-  hello: "world";
-}
+- [ ] None
 
-const Topic = "test-topic";
-const TopicGroup = process.env.KAFKA_CONSUMER_GROUP as string;
+## Contributing
 
-// @ts-ignore
-const processor = function (payload: TestMessage, message: KafkaMessage) {
-  // do stuff here
-};
+```bash
+# Clone the repo
+git clone git@github.com:CodrJS/codr-user-user.git
 
-const TestConsumer = new Consumer<TestMessage>({
-  processor,
-  groupId: TopicGroup,
-  topics: [Topic],
-});
+# Install yarn if you don't have it already
+npm install -g yarn
 
-export default TestConsumer;
-```
+# Install dependencies and build the code
+yarn install
+yarn build
 
-## Heath Checks
-
-The `@codrjs/kafka` module automatically adds the Kafka admin client and all producers and consumers to the health check.
-
-The only health checks that need to be added manually are for the express server and mongoose instance.
-
-```ts
-import { ServiceHealth } from "@codrjs/health";
-
-// for Express, add the following events to the appropriate handlers.
-//   This is done for you in this template.
-ServiceHealth.handleEvent("express", "connect");
-ServiceHealth.handleEvent("express", "disconnect");
-
-// for Mongoose, add the connection property to the health monitor
-import mongoose from "mongoose";
-
-const client = mongoose.connect(...);
-ServiceHealth.addMongo(client.connection);
+# Building the docker image
+yarn build:docker
 ```
