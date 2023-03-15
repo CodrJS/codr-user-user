@@ -5,7 +5,18 @@ import UserAbility from "../mongo/User.ability";
 export class UserUtility extends Utility {
   // an internal method for getting the desired document to check against permissions
   protected async _getDocument<T>(id: string) {
-    return (await MongoUser.findById(id)) as T;
+    try {
+      return (await MongoUser.findById(id)) as T;
+    } catch (err) {
+      throw new Error({
+        status: 500,
+        message: "Something went wrong when fetching user",
+        details: {
+          userId: id,
+          error: err,
+        },
+      });
+    }
   }
 
   async get(token: IUser, id: string) {
