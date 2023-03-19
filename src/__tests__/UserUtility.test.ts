@@ -5,7 +5,7 @@ import User from "@/mongo/User";
 const Utility = new UserUtility();
 
 const testSystemUser: IUser = {
-  _id: new Types.ObjectId("0000"),
+  _id: new Types.ObjectId(0),
   type: "member",
   email: "system@codrjs.com",
   role: "codr:system",
@@ -17,7 +17,7 @@ const testSystemUser: IUser = {
 };
 
 const testAdminUser: IUser = {
-  _id: new Types.ObjectId("1111"),
+  _id: new Types.ObjectId(1),
   type: "member",
   email: "admin@codrjs.com",
   role: "codr:admin",
@@ -29,7 +29,7 @@ const testAdminUser: IUser = {
 };
 
 const testResearchUser: IUser = {
-  _id: new Types.ObjectId("2222"),
+  _id: new Types.ObjectId(2),
   type: "member",
   email: "researcher@codrjs.com",
   role: "codr:researcher",
@@ -41,7 +41,7 @@ const testResearchUser: IUser = {
 };
 
 const testAnnotatorUser: IUser = {
-  _id: new Types.ObjectId("3333"),
+  _id: new Types.ObjectId(3),
   type: "member",
   email: "annotator@codrjs.com",
   role: "codr:annotator",
@@ -53,7 +53,7 @@ const testAnnotatorUser: IUser = {
 };
 
 const demoNewUser: IUser = {
-  _id: new Types.ObjectId("4444"),
+  _id: new Types.ObjectId(4),
   type: "anonymous",
   email: "adduser@codrjs.com",
   role: "codr:annotator",
