@@ -1,7 +1,7 @@
-import { types, IUser } from "@codrjs/models";
+import { Types, IUser } from "@codrjs/models";
 import { UserDocument } from "./User";
 
-const permissions: types.Permissions<UserDocument, "User"> = {
+const permissions: Types.Permissions<UserDocument, "User"> = {
   /**
    * @TODO find a way to disallow system from creating system users.
    */
@@ -28,5 +28,5 @@ const permissions: types.Permissions<UserDocument, "User"> = {
   },
 };
 
-const UserAbility = (user: IUser) => types.DefineAbility(user, permissions);
+const UserAbility = (user: IUser) => Types.DefineAbility(user, permissions);
 export default UserAbility;
