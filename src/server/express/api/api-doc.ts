@@ -11,7 +11,8 @@ import {
   R500,
   R503,
 } from "@dylanbulmer/openapi/classes/responses";
-import { ErrorSchema, GenericSchema } from "./schemas";
+import { BaseSchema, ErrorSchema, GenericSchema, UserSchema } from "./schemas";
+import { BearerScheme } from "./schemes";
 
 const settings: OpenAPIV3_1.Document = {
   openapi: "3.1.0",
@@ -26,12 +27,12 @@ const settings: OpenAPIV3_1.Document = {
 
   info: {
     version: "1.0.0",
-    title: "Example API",
-    description: "A sample API to illustrate OpenAPI concepts",
+    title: "User Entity API",
+    description: "Preform CRUD operations on the user collection in Mongo.",
     contact: {
       name: "Dylan Bulmer",
-      url: "https://dylanbulmer.com",
-      email: "dylan@dylanbulmer.com",
+      url: "https://codrjs.com",
+      email: "dylan@codrjs.com",
     },
     license: {
       name: "MIT",
@@ -56,8 +57,13 @@ const settings: OpenAPIV3_1.Document = {
       "503": R503,
     },
     schemas: {
-      GenericSchema: GenericSchema,
-      ErrorSchema: ErrorSchema,
+      BaseSchema,
+      ErrorSchema,
+      GenericSchema,
+      UserSchema,
+    },
+    securitySchemes: {
+      Bearer: BearerScheme,
     },
   },
 };

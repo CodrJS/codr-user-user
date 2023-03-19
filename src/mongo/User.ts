@@ -25,7 +25,7 @@ const UserSchema = new Schema<UserDocument>(
     },
     role: {
       type: String,
-      enum: ["codr:admin", "codr:researcher", "codr:annotator"],
+      enum: ["codr:admin", "codr:annotator", "codr:researcher", "codr:system"],
       required: true,
       default: "codr:annotator",
     },
@@ -38,6 +38,7 @@ const UserSchema = new Schema<UserDocument>(
       default: {
         isAnonymous: false,
         isDisabled: false,
+        isDeleted: false,
       },
     },
     createdAt: { type: String },

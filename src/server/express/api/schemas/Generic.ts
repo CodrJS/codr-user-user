@@ -2,7 +2,7 @@ import type { OpenAPIV3_1 } from "openapi-types";
 
 const GenericSchema: OpenAPIV3_1.SchemaObject = {
   title: "Generic Schema",
-  required: ["detail"],
+  required: ["message"],
   properties: {
     message: {
       type: "string",

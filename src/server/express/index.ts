@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import dotenv from "dotenv";
+import config from "@codrjs/config";
 
 import v1 from "./api";
 import morgan from "./middlewares/morgan.middleware";
@@ -10,10 +10,8 @@ import ExpressLogger from "./utils/logger";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { ServiceHealth } from "@codrjs/health";
 
-dotenv.config();
-
 const app: Express = express();
-const port = process.env.EXPRESS_PORT || 3000;
+const port = config.express.port || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -49,7 +47,6 @@ app.use((req, res, next) => {
 let server: Server<typeof IncomingMessage, typeof ServerResponse>;
 
 export const start = () => {
-  console.log("server?");
   server = app.listen(port, () => {
     ExpressLogger.info(`Started on 0.0.0.0:${port}`);
     ServiceHealth.handleEvent("express", "connect");
