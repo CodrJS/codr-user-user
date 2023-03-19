@@ -1,11 +1,11 @@
 import { Error, IUser } from "@codrjs/models";
 import { UserUtility } from "@/utils/UserUtility";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import User from "@/mongo/User";
 const Utility = new UserUtility();
 
 const testSystemUser: IUser = {
-  _id: "0000" as unknown as ObjectId,
+  _id: new Types.ObjectId("0000"),
   type: "member",
   email: "system@codrjs.com",
   role: "codr:system",
@@ -17,7 +17,7 @@ const testSystemUser: IUser = {
 };
 
 const testAdminUser: IUser = {
-  _id: "1111" as unknown as ObjectId,
+  _id: new Types.ObjectId("1111"),
   type: "member",
   email: "admin@codrjs.com",
   role: "codr:admin",
@@ -29,7 +29,7 @@ const testAdminUser: IUser = {
 };
 
 const testResearchUser: IUser = {
-  _id: "2222" as unknown as ObjectId,
+  _id: new Types.ObjectId("2222"),
   type: "member",
   email: "researcher@codrjs.com",
   role: "codr:researcher",
@@ -41,7 +41,7 @@ const testResearchUser: IUser = {
 };
 
 const testAnnotatorUser: IUser = {
-  _id: "3333" as unknown as ObjectId,
+  _id: new Types.ObjectId("3333"),
   type: "member",
   email: "annotator@codrjs.com",
   role: "codr:annotator",
@@ -53,7 +53,7 @@ const testAnnotatorUser: IUser = {
 };
 
 const demoNewUser: IUser = {
-  _id: "ADDED_UESR" as unknown as ObjectId,
+  _id: new Types.ObjectId("4444"),
   type: "anonymous",
   email: "adduser@codrjs.com",
   role: "codr:annotator",

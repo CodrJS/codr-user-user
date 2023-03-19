@@ -340,10 +340,10 @@
   dependencies:
     winston "^3.8.2"
 
-"@codrjs/models@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@codrjs/models/-/models-1.0.0.tgz#b382d14a4b824e902d1b4ab056180e6ac020242d"
-  integrity sha512-o+9HYsqQQlrtF3Pn7c2I0MT3LxIfVkEJlGenFEt9QeUL99of6FR1S5n0NWeylcMCPLKHKolvuOsGbZB8CEaG1Q==
+"@codrjs/models@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@codrjs/models/-/models-1.0.2.tgz#d948f123fbee593714101a9cd20b1ceb2db9b26d"
+  integrity sha512-xssDfrlA3xOyYyvfuRY8tWOF0vEclHy4r/CFPo+6aW0l7WqDuwnMQydNNJvScaw73jsX2fRSjL3FpR8m+6z2Cw==
 
 "@colors/colors@1.5.0":
   version "1.5.0"

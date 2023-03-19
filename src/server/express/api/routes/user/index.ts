@@ -20,8 +20,8 @@ POST.apiDoc = {
   description: "Create a user in the database.",
   tags: ["User Management"],
   responses: {
-    "200": {
-      $ref: "#/components/responses/200",
+    "201": {
+      $ref: "#/components/responses/201",
       content: {
         "application/json": {
           schema: {
