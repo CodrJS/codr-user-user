@@ -1,19 +1,20 @@
 import { EmailRegex, IUser } from "@codrjs/models";
-import type { Document } from "mongoose";
 import { model, Schema } from "mongoose";
 import {
+  AccessibleFieldsModel,
   accessibleFieldsPlugin,
   AccessibleModel,
   accessibleRecordsPlugin,
 } from "@casl/mongoose";
 
-const UserSchema = new Schema<IUser>(
+export type UserDocument = IUser & AccessibleFieldsModel<IUser>;
+const UserSchema = new Schema<UserDocument>(
   {
     type: {
       type: String,
       enum: ["anonymous", "member", "external"],
       required: true,
-      default: "member",
+      default: "anonymous",
     },
     email: {
       type: String,
@@ -48,7 +49,6 @@ const UserSchema = new Schema<IUser>(
 );
 
 // exports User model.
-export type UserDocument = IUser & Document;
 UserSchema.plugin(accessibleFieldsPlugin);
 UserSchema.plugin(accessibleRecordsPlugin);
 const User = model<IUser, AccessibleModel<UserDocument>>("User", UserSchema);

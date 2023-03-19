@@ -1,3 +1,4 @@
+import { subject } from "@casl/ability";
 import { User, IUser, Utility, Error, Response } from "@codrjs/models";
 import MongoUser, { UserDocument } from "../mongo/User";
 import UserAbility from "../mongo/User.ability";
@@ -24,7 +25,7 @@ export class UserUtility extends Utility {
     const user = await this._getDocument<UserDocument>(id);
 
     // if user and read the document, send it, else throw error
-    if (UserAbility(token).can("read", user)) {
+    if (UserAbility(token).can("read", subject("User", user))) {
       return new Response({
         message: "OK",
         details: {
@@ -34,7 +35,7 @@ export class UserUtility extends Utility {
     } else {
       throw new Error({
         status: 403,
-        message: "You are forbidden from reading this user.",
+        message: "User is forbidden from reading this user.",
       });
     }
   }
@@ -61,7 +62,7 @@ export class UserUtility extends Utility {
     } else {
       throw new Error({
         status: 403,
-        message: "You are forbidden from creating users.",
+        message: "User is forbidden from creating users.",
       });
     }
   }
@@ -71,7 +72,7 @@ export class UserUtility extends Utility {
     const user = await this._getDocument<UserDocument>(id);
 
     // check permissions
-    if (UserAbility(token).can("update", user)) {
+    if (UserAbility(token).can("update", subject("User", user))) {
       try {
         // update user.
         const user = (await MongoUser.findByIdAndUpdate(id, obj, {
@@ -95,7 +96,7 @@ export class UserUtility extends Utility {
     } else {
       throw new Error({
         status: 403,
-        message: "You are forbidden from updating this user.",
+        message: "User is forbidden from updating this user.",
       });
     }
   }
