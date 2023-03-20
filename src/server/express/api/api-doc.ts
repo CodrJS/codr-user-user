@@ -11,7 +11,13 @@ import {
   R500,
   R503,
 } from "@dylanbulmer/openapi/classes/responses";
-import { BaseSchema, ErrorSchema, GenericSchema, UserSchema } from "./schemas";
+import {
+  BaseEntitySchema,
+  ErrorSchema,
+  GenericSchema,
+  HealthSchema,
+  UserEntitySchema,
+} from "./schemas";
 import { BearerScheme } from "./schemes";
 
 const settings: OpenAPIV3_1.Document = {
@@ -57,10 +63,11 @@ const settings: OpenAPIV3_1.Document = {
       "503": R503,
     },
     schemas: {
-      BaseSchema,
+      BaseEntitySchema,
       ErrorSchema,
       GenericSchema,
-      UserSchema,
+      HealthSchema,
+      UserEntitySchema,
     },
     securitySchemes: {
       Bearer: BearerScheme,

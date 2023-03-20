@@ -1,8 +1,8 @@
 import type { OpenAPIV3_1 } from "openapi-types";
 
 const UserSchema: OpenAPIV3_1.SchemaObject = {
-  title: "User Schema",
-  allOf: [{ $ref: "#/components/schemas/BaseSchema" }],
+  title: "User Entity Schema",
+  allOf: [{ $ref: "#/components/schemas/BaseEntitySchema" }],
   required: ["email", "type", "role", "flags"],
   properties: {
     type: {

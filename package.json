@@ -1,7 +1,7 @@
 {
-  "name": "ts-kakfa-template",
+  "name": "codr-user-user",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "start": "node dist/serve.js",
     "build": "swc ./src -d dist",

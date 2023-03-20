@@ -2,6 +2,7 @@ import { Error } from "@codrjs/models";
 import { Operation } from "@dylanbulmer/openapi/types/Route";
 import verifyJWT from "../../middlewares/verifyJWT";
 import { UserUtility } from "../../../../../utils/UserUtility";
+import { R201, R401, R403, R500 } from "@dylanbulmer/openapi/classes/responses";
 
 export const POST: Operation = [
   /* business middleware not expressible by OpenAPI documentation goes here */
@@ -21,7 +22,7 @@ POST.apiDoc = {
   tags: ["User Management"],
   responses: {
     "201": {
-      $ref: "#/components/responses/201",
+      description: R201.description,
       content: {
         "application/json": {
           schema: {
@@ -30,7 +31,7 @@ POST.apiDoc = {
                 type: "object",
                 properties: {
                   user: {
-                    $ref: "#/components/schemas/UserSchema",
+                    $ref: "#/components/schemas/UserEntitySchema",
                   },
                 },
               },
@@ -44,7 +45,7 @@ POST.apiDoc = {
       },
     },
     "401": {
-      $ref: "#/components/responses/401",
+      description: R401.description,
       content: {
         "application/json": {
           schema: {
@@ -67,7 +68,7 @@ POST.apiDoc = {
       },
     },
     "403": {
-      $ref: "#/components/responses/403",
+      description: R403.description,
       content: {
         "application/json": {
           schema: {
@@ -90,7 +91,7 @@ POST.apiDoc = {
       },
     },
     "500": {
-      $ref: "#/components/responses/500",
+      description: R500.description,
       content: {
         "application/json": {
           schema: {

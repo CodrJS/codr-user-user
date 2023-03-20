@@ -1,7 +1,7 @@
 import type { OpenAPIV3_1 } from "openapi-types";
 
-const BaseSchema: OpenAPIV3_1.SchemaObject = {
-  title: "Base Schema",
+const BaseEntitySchema: OpenAPIV3_1.SchemaObject = {
+  title: "Base Entity Schema",
   properties: {
     __v: {
       type: "number",
@@ -19,4 +19,4 @@ const BaseSchema: OpenAPIV3_1.SchemaObject = {
   },
 };
 
-export default BaseSchema;
+export default BaseEntitySchema;

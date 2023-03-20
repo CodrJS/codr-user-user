@@ -2,6 +2,7 @@ import { Error } from "@codrjs/models";
 import { Operation } from "@dylanbulmer/openapi/types/Route";
 import verifyJWT from "../../middlewares/verifyJWT";
 import { UserUtility } from "../../../../../utils/UserUtility";
+import { R200, R401, R403, R500 } from "@dylanbulmer/openapi/classes/responses";
 
 export const GET: Operation = [
   /* business middleware not expressible by OpenAPI documentation goes here */
@@ -45,7 +46,7 @@ GET.apiDoc = {
   tags: ["User Management"],
   responses: {
     "200": {
-      $ref: "#/components/responses/200",
+      description: R200.description,
       content: {
         "application/json": {
           schema: {
@@ -54,7 +55,7 @@ GET.apiDoc = {
                 type: "object",
                 properties: {
                   user: {
-                    $ref: "#/components/schemas/UserSchema",
+                    $ref: "#/components/schemas/UserEntitySchema",
                   },
                 },
               },
@@ -68,7 +69,7 @@ GET.apiDoc = {
       },
     },
     "401": {
-      $ref: "#/components/responses/401",
+      description: R401.description,
       content: {
         "application/json": {
           schema: {
@@ -91,7 +92,7 @@ GET.apiDoc = {
       },
     },
     "403": {
-      $ref: "#/components/responses/403",
+      description: R403.description,
       content: {
         "application/json": {
           schema: {
@@ -127,7 +128,7 @@ PATCH.apiDoc = {
   tags: ["User Management"],
   responses: {
     "200": {
-      $ref: "#/components/responses/200",
+      description: R200.description,
       content: {
         "application/json": {
           schema: {
@@ -136,7 +137,7 @@ PATCH.apiDoc = {
                 type: "object",
                 properties: {
                   user: {
-                    $ref: "#/components/schemas/UserSchema",
+                    $ref: "#/components/schemas/UserEntitySchema",
                   },
                 },
               },
@@ -150,7 +151,7 @@ PATCH.apiDoc = {
       },
     },
     "401": {
-      $ref: "#/components/responses/401",
+      description: R401.description,
       content: {
         "application/json": {
           schema: {
@@ -173,7 +174,7 @@ PATCH.apiDoc = {
       },
     },
     "403": {
-      $ref: "#/components/responses/403",
+      description: R403.description,
       content: {
         "application/json": {
           schema: {
@@ -196,7 +197,7 @@ PATCH.apiDoc = {
       },
     },
     "500": {
-      $ref: "#/components/responses/500",
+      description: R500.description,
       content: {
         "application/json": {
           schema: {
@@ -234,7 +235,7 @@ DELETE.apiDoc = {
   tags: ["User Management"],
   responses: {
     "200": {
-      $ref: "#/components/responses/200",
+      description: R200.description,
       content: {
         "application/json": {
           schema: {
@@ -257,7 +258,7 @@ DELETE.apiDoc = {
       },
     },
     "401": {
-      $ref: "#/components/responses/401",
+      description: R401.description,
       content: {
         "application/json": {
           schema: {
@@ -280,7 +281,7 @@ DELETE.apiDoc = {
       },
     },
     "403": {
-      $ref: "#/components/responses/403",
+      description: R403.description,
       content: {
         "application/json": {
           schema: {
@@ -303,7 +304,7 @@ DELETE.apiDoc = {
       },
     },
     "500": {
-      $ref: "#/components/responses/500",
+      description: R500.description,
       content: {
         "application/json": {
           schema: {

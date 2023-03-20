@@ -1,5 +1,6 @@
 import { Operation } from "@dylanbulmer/openapi/types/Route";
 import { ServiceHealth } from "@codrjs/health";
+import { R200 } from "@dylanbulmer/openapi/classes/responses";
 
 export const GET: Operation =
   /* business middleware not expressible by OpenAPI documentation goes here */
@@ -13,21 +14,11 @@ GET.apiDoc = {
   tags: ["System"],
   responses: {
     "200": {
-      $ref: "#/components/responses/200",
+      description: R200.description,
       content: {
         "application/json": {
           schema: {
-            properties: {
-              detail: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    examples: ["OK"],
-                  },
-                },
-              },
-            },
+            $ref: "#/components/schemas/HealthSchema",
           },
         },
       },
