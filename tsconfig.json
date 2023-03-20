@@ -18,7 +18,10 @@
     "outDir": "dist",
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/express/*": ["./server/express/*"],
+      "@/kakfa/*": ["./server/kafka/*"],
+      "@/mongo/*": ["./server/mongo/*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },

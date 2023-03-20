@@ -4,7 +4,7 @@ import cors from "cors";
 import config from "@codrjs/config";
 import v1 from "./api";
 import morgan from "./middlewares/morgan.middleware";
-import { Error } from "./classes/Error";
+import { Error } from "@codrjs/models";
 import ExpressLogger from "./utils/logger";
 import type { IncomingMessage, Server, ServerResponse } from "http";
 import { ServiceHealth } from "@codrjs/health";

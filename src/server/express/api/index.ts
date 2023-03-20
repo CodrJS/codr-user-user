@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import { initialize } from "@dylanbulmer/openapi";
 import apiDoc from "./api-doc";
-import { Error } from "../classes/Error";
+import { Error } from "@codrjs/models";
 
 const app = express();
 
