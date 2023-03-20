@@ -1,7 +1,7 @@
 import { subject } from "@casl/ability";
 import { User, IUser, Utility, Error, Response } from "@codrjs/models";
-import MongoUser, { UserDocument } from "../mongo/User";
-import UserAbility from "../mongo/User.ability";
+import MongoUser, { UserDocument } from "../entities/User";
+import UserAbility from "../entities/User.ability";
 
 export class UserUtility extends Utility {
   // an internal method for getting the desired document to check against permissions
