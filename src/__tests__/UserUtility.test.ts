@@ -1,7 +1,7 @@
 import { Error, IUser } from "@codrjs/models";
 import { UserUtility } from "@/utils/UserUtility";
 import { Types } from "mongoose";
-import User from "@/mongo/User";
+import User from "@/entities/User";
 const Utility = new UserUtility();
 
 const testSystemUser: IUser = {
