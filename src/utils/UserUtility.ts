@@ -20,6 +20,21 @@ export class UserUtility extends Utility {
     }
   }
 
+  private async _getDocumentByEmail<T>(email: string) {
+    try {
+      return (await MongoUser.findOne({ email })) as T;
+    } catch (err) {
+      throw new Error({
+        status: 500,
+        message: "Something went wrong when fetching user",
+        details: {
+          email,
+          error: err,
+        },
+      });
+    }
+  }
+
   async get(token: IUser, id: string) {
     // get desired user document
     const user = await this._getDocument<UserDocument>(id);
@@ -38,6 +53,18 @@ export class UserUtility extends Utility {
         message: "User is forbidden from reading this user.",
       });
     }
+  }
+
+  async getByEmail(email: string) {
+    // get desired user document
+    return await this._getDocumentByEmail<UserDocument>(email).then(user => {
+      return new Response({
+        message: "OK",
+        details: {
+          user: new User(user),
+        },
+      });
+    });
   }
 
   async create(token: IUser, obj: IUser) {
