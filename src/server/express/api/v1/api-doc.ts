@@ -24,7 +24,6 @@ import { OpenAPI } from "@codrjs/models";
 import Config from "@codrjs/config";
 
 const OpenAPIConfig = new OpenAPI();
-console.log(Config.openapi);
 
 const settings: OpenAPIV3_1.Document = {
   openapi: "3.1.0",
