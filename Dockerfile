@@ -16,13 +16,33 @@ RUN yarn build
 FROM node:16-alpine
 WORKDIR /usr/src
 
-COPY --from=builder /usr/src/dist ./dist
+# Set up env vars
+ARG VERSION
+ARG GIT_BRANCH
+ARG GIT_COMMIT
+ARG GIT_REPO
+
+ENV NODE_ENV="production"
+ENV VERSION=${VERSION}
+ENV GIT_BRANCH=${GIT_BRANCH}
+ENV GIT_COMMIT=${GIT_COMMIT}
+ENV GIT_REPO=${GIT_REPO}
+
+# Set up user and group
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S service -u 1001
+
+# update owner
+RUN chown -R service:nodejs ./
+
+# copy files
+COPY --chown=service:nodejs --from=builder /usr/src/dist ./dist
 COPY --from=builder /usr/src/node_modules ./node_modules
 COPY --from=builder /usr/src/package.json ./package.json
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S service -u 1001
-RUN chown -R service:nodejs /usr/src/dist
+# use user and create logs dir
 USER service
+RUN mkdir /usr/src/logs
 
+EXPOSE 8000
 CMD ["yarn", "start"]

@@ -2,7 +2,7 @@ import express, { Express } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import config from "@codrjs/config";
-import v1 from "./api";
+import v1 from "./api/v1";
 import morgan from "./middlewares/morgan.middleware";
 import { Error } from "@codrjs/models";
 import ExpressLogger from "./utils/logger";
@@ -17,7 +17,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan);
 
-app.use("/api", v1);
+app.use("/v1", v1);
 
 app.use(((err, req, res, next) => {
   // if headers are already sent, let express handler the error
@@ -26,7 +26,7 @@ app.use(((err, req, res, next) => {
   }
 
   // if the path is for the API, have it handle the error
-  if (req.path.startsWith("/api")) {
+  if (req.path.startsWith("/v1")) {
     return v1.get("errorHandler")(err, req, res, next);
   }
 
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
   // catch 404 errors?
 
   // if the path is for API v1, have v1 handler the error
-  if (req.path.startsWith("/api")) {
+  if (req.path.startsWith("/v1")) {
     const err = new Error({ status: 404, message: `not found: ${req.path}` });
     return v1.get("errorHandler")(err, req, res, next);
   }

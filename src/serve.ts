@@ -1,4 +1,5 @@
 import { Kafka, Express, Mongo } from "./server";
+import "@codrjs/config";
 
 Mongo.start();
 // Kafka.start();
