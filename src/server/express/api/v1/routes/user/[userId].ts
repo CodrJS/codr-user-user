@@ -11,7 +11,7 @@ export const GET: Operation = [
     const util = new UserUtility();
     util
       .get(req.user, req.params.userId)
-      .then(res.status(200).json)
+      .then(resp => res.status(200).json(resp))
       .catch((err: Error) => res.status(err.status).json(err));
   },
 ];
@@ -23,7 +23,7 @@ export const PATCH: Operation = [
     const util = new UserUtility();
     util
       .update(req.user, req.params.userId, req.body)
-      .then(res.status(200).json)
+      .then(resp => res.status(200).json(resp))
       .catch((err: Error) => res.status(err.status).json(err));
   },
 ];
@@ -35,7 +35,7 @@ export const DELETE: Operation = [
     const util = new UserUtility();
     util
       .delete(req.user, req.params.userId)
-      .then(res.status(200).json)
+      .then(resp => res.status(200).json(resp))
       .catch((err: Error) => res.status(err.status).json(err));
   },
 ];

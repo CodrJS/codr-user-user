@@ -11,7 +11,7 @@ export const POST: Operation = [
     const util = new UserUtility();
     util
       .create(req.user, req.body)
-      .then(res.status(200).json)
+      .then(resp => res.status(200).json(resp))
       .catch((err: Error) => res.status(err.status).json(err));
   },
 ];

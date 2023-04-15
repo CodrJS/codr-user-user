@@ -11,7 +11,7 @@ export const GET: Operation = [
     const util = new UserUtility();
     util
       .get(req.user, <string>(req.user._id as unknown))
-      .then(res.status(200).json)
+      .then(resp => res.status(200).json(resp))
       .catch((err: Error) => res.status(err.status).json(err));
   },
 ];
