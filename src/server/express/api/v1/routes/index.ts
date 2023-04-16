@@ -1,7 +1,7 @@
 import { Error } from "@codrjs/models";
 import { Operation } from "@dylanbulmer/openapi/types/Route";
-import verifyJWT from "../../../../middlewares/verifyJWT";
-import { UserUtility } from "../../../../../../utils/UserUtility";
+import verifyJWT from "@/server/express/middlewares/verifyJWT";
+import { UserUtility } from "@/utils/UserUtility";
 import { R201, R401, R403, R500 } from "@dylanbulmer/openapi/classes/responses";
 
 export const POST: Operation = [
