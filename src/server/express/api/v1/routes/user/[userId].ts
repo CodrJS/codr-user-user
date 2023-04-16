@@ -44,6 +44,17 @@ export const DELETE: Operation = [
 GET.apiDoc = {
   description: "Get user from database.",
   tags: ["User Management"],
+  parameters: [
+    {
+      in: "path",
+      name: "userId",
+      schema: {
+        type: "string",
+      },
+      required: true,
+      description: "User identifier",
+    }
+  ],
   responses: {
     "200": {
       description: R200.description,
@@ -126,6 +137,17 @@ GET.apiDoc = {
 PATCH.apiDoc = {
   description: "Update user in database.",
   tags: ["User Management"],
+  parameters: [
+    {
+      in: "path",
+      name: "userId",
+      schema: {
+        type: "string",
+      },
+      required: true,
+      description: "User identifier",
+    }
+  ],
   responses: {
     "200": {
       description: R200.description,
@@ -233,6 +255,17 @@ PATCH.apiDoc = {
 DELETE.apiDoc = {
   description: "Delete user from database. This action preforms a soft-delete.",
   tags: ["User Management"],
+  parameters: [
+    {
+      in: "path",
+      name: "userId",
+      schema: {
+        type: "string",
+      },
+      required: true,
+      description: "User identifier",
+    }
+  ],
   responses: {
     "200": {
       description: R200.description,

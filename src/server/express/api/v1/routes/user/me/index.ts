@@ -1,7 +1,7 @@
 import { Error } from "@codrjs/models";
 import { Operation } from "@dylanbulmer/openapi/types/Route";
-import verifyJWT from "../../../../middlewares/verifyJWT";
-import { UserUtility } from "../../../../../../utils/UserUtility";
+import verifyJWT from "@/server/express/middlewares/verifyJWT";
+import { UserUtility } from "../../../../../../../utils/UserUtility";
 import { R200, R401, R403 } from "@dylanbulmer/openapi/classes/responses";
 
 export const GET: Operation = [
@@ -10,7 +10,8 @@ export const GET: Operation = [
   (req, res) => {
     const util = new UserUtility();
     util
-      .get(req.user, <string>(req.user._id as unknown))
+      // @ts-ignore
+      .get(req.user, req.user["_id"])
       .then(resp => res.status(200).json(resp))
       .catch((err: Error) => res.status(err.status).json(err));
   },
