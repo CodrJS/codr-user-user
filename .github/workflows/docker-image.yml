@@ -23,6 +23,9 @@ jobs:
       - run: yarn build
       - env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_ALGORITHM: ${{ vars.JWT_ALGORITHM }}
+          JWT_ISSUER: ${{ vars.JWT_ISSUER }}
         run: yarn test
 
   # define job to build and publish docker image
