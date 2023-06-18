@@ -21,7 +21,9 @@ jobs:
           node-version: "16.x"
       - run: yarn
       - run: yarn build
-      - run: yarn test
+      - env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: yarn test
 
   # define job to build and publish docker image
   build-and-publish:

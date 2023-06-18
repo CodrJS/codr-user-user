@@ -51,7 +51,7 @@ Environment variables provided by CI/CD
 | `GIT_REPO`        | `git.repo`         | Git - repository                                          |
 | `NODE_ENV`        | `node.env`         | Node environment - `development`, `production`, `testing` |
 | Provided via npm  | `node.verison`     | Node version - example: `16.19.1`                         |
-| Provided via npm  | `node.modules`     | Node modules - string array of all dependencies           |
+| Provided via yarn | `node.modules`     | Node modules - string array of all dependencies           |
 | Provided via yarn | `node.yarnVersion` | Node - package manager version                            |
 
 ## Contributing

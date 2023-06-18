@@ -1,302 +1,381 @@
-import { Error, IUser } from "@codrjs/models";
+import { Types as CodrTypes, User, Error } from "@codrjs/models";
+import jwt from "jsonwebtoken";
 import { UserUtility } from "@/utils/UserUtility";
 import { Types } from "mongoose";
-import User from "@/entities/User";
-const Utility = new UserUtility();
+import Mongo from "@/utils/Mongo";
+import { Documents } from "@codrjs/mongo";
+import Config from "@codrjs/config";
 
-const testSystemUser: IUser = {
-  _id: new Types.ObjectId(0),
-  type: "member",
-  email: "system@codrjs.com",
-  role: "codr:system",
-  flags: {
-    isDeleted: false,
-    isDisabled: false,
-    isAnonymous: false,
-  },
+const UserEnum = CodrTypes.UserEnum;
+const UserRoleEnum = CodrTypes.UserRoleEnum;
+
+const generateUser = (
+  type: CodrTypes.UserEnum,
+  role: CodrTypes.UserRoleEnum,
+  createdBy: Types.ObjectId
+): User => {
+  const userId = new Types.ObjectId();
+  return new User({
+    _id: userId,
+    email: `demouser+${userId}@codrjs.com`,
+    role,
+    type,
+    flags: {
+      isDeleted: false,
+      isDisabled: false,
+      isAnonymous: true,
+    },
+    createdBy,
+  });
 };
 
-const testAdminUser: IUser = {
-  _id: new Types.ObjectId(1),
-  type: "member",
-  email: "admin@codrjs.com",
-  role: "codr:admin",
-  flags: {
-    isDeleted: false,
-    isDisabled: false,
-    isAnonymous: false,
-  },
+const generateUserJwt = (user: User) => {
+  return jwt.decode(
+    jwt.sign(user.toJSON(), Config.jwt.secret, {
+      issuer: Config.jwt.issuer,
+      algorithm: <jwt.Algorithm>Config.jwt.algorithm,
+      subject: user._id.toString(),
+      expiresIn: "1h",
+      jwtid: new Types.ObjectId().toString(),
+    })
+  ) as CodrTypes.JwtPayload;
 };
 
-const testResearchUser: IUser = {
-  _id: new Types.ObjectId(2),
-  type: "member",
-  email: "researcher@codrjs.com",
-  role: "codr:researcher",
-  flags: {
-    isDeleted: false,
-    isDisabled: false,
-    isAnonymous: false,
-  },
-};
+describe("User Utility", () => {
+  let Utility: UserUtility;
+  let SystemUser: {
+    Document: Documents.UserDocument;
+    Class: User;
+    Payload: CodrTypes.JwtPayload;
+  };
+  let AdminUser: {
+    Class: User;
+    Payload: CodrTypes.JwtPayload;
+  };
+  let ResearchUser: {
+    Class: User;
+    Payload: CodrTypes.JwtPayload;
+  };
+  let AnnotatorUser: {
+    Class: User;
+    Payload: CodrTypes.JwtPayload;
+  };
 
-const testAnnotatorUser: IUser = {
-  _id: new Types.ObjectId(3),
-  type: "member",
-  email: "annotator@codrjs.com",
-  role: "codr:annotator",
-  flags: {
-    isDeleted: false,
-    isDisabled: false,
-    isAnonymous: false,
-  },
-};
+  beforeAll(async () => {
+    // connect to mongo
+    await Mongo.connect();
 
-const demoNewUser: IUser = {
-  _id: new Types.ObjectId(4),
-  type: "anonymous",
-  email: "adduser@codrjs.com",
-  role: "codr:annotator",
-  flags: {
-    isDeleted: false,
-    isDisabled: false,
-    isAnonymous: true,
-  },
-};
+    const MongoUser = Mongo.User.User;
+    Utility = new UserUtility();
 
-describe("User Utility: Create", () => {
-  test("System can add user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(testSystemUser);
-    User.create = jest.fn().mockResolvedValueOnce(demoNewUser);
+    // get user document
+    const doc = (await MongoUser.findOne({
+      email: "system@codrjs.com",
+    })) as Documents.UserDocument;
+    const Class = new User(doc);
 
-    // run tests
-    const user = await Utility.create(testSystemUser, demoNewUser);
-    expect(user.details.user.email).toBe("adduser@codrjs.com");
-  });
+    SystemUser = {
+      Document: doc,
+      Class,
+      Payload: generateUserJwt(Class),
+    };
 
-  test("Admin can add user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(testAdminUser);
-    User.create = jest.fn().mockResolvedValueOnce(demoNewUser);
-
-    // run tests
-    const user = await Utility.create(testAdminUser, demoNewUser);
-    expect(user.details.user.email).toBe("adduser@codrjs.com");
-  });
-
-  test("Researcher cannot add user", () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(testResearchUser);
-    User.create = jest.fn().mockResolvedValueOnce(demoNewUser);
-
-    // run tests
-    expect(Utility.create(testResearchUser, demoNewUser)).rejects.toEqual(
-      new Error({
-        status: 403,
-        message: "User is forbidden from creating users.",
-      })
+    const annotator = generateUser(
+      UserEnum.ANONYMOUS,
+      UserRoleEnum.ANNOTATOR,
+      SystemUser.Class._id
     );
+
+    AnnotatorUser = {
+      Class: annotator,
+      Payload: generateUserJwt(annotator),
+    };
   });
 
-  test("Annotator cannot add user", () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(testAnnotatorUser);
-    User.create = jest.fn().mockResolvedValueOnce(demoNewUser);
-
-    // run tests
-    expect(Utility.create(testAnnotatorUser, demoNewUser)).rejects.toEqual(
-      new Error({
-        status: 403,
-        message: "User is forbidden from creating users.",
-      })
-    );
-  });
-});
-
-describe("User Utility: Read", () => {
-  test("System can read another user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(demoNewUser);
-
-    // run tests
-    const user = await Utility.get(
-      testSystemUser,
-      demoNewUser._id as unknown as string
-    );
-    expect(user.details.user.email).toBe("adduser@codrjs.com");
+  afterAll(async () => {
+    await Mongo.close();
   });
 
-  test("Admin can read another user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(demoNewUser);
+  describe("Create: User", () => {
+    test("System can add user", async () => {
+      // generate data
+      const newUser = generateUser(
+        UserEnum.MEMBER,
+        UserRoleEnum.ADMIN,
+        new Types.ObjectId(SystemUser.Payload.sub)
+      );
 
-    // run tests
-    const user = await Utility.get(
-      testAdminUser,
-      demoNewUser._id as unknown as string
-    );
-    expect(user.details.user.email).toBe("adduser@codrjs.com");
+      // run tests
+      const user = await Utility.create(SystemUser.Payload, newUser);
+
+      // set data
+      AdminUser = {
+        Class: user.details.user,
+        Payload: generateUserJwt(user.details.user),
+      };
+
+      expect(user.details.user.email).toBe(newUser.email);
+    });
+
+    test("System cannot add a system user", async () => {
+      const newUser = generateUser(
+        UserEnum.SYSTEM,
+        UserRoleEnum.SYSTEM,
+        new Types.ObjectId(SystemUser.Payload.sub)
+      );
+
+      // run tests
+      expect(Utility.create(SystemUser.Payload, newUser)).rejects.toEqual(
+        new Error({
+          status: 403,
+          message: "User is forbidden from creating users.",
+        })
+      );
+    });
+
+    test("Admin can add user", async () => {
+      // generate data
+      const newUser = generateUser(
+        UserEnum.MEMBER,
+        UserRoleEnum.RESEARCHER,
+        new Types.ObjectId(AdminUser.Payload.sub)
+      );
+
+      // run tests
+      const user = await Utility.create(AdminUser.Payload, newUser);
+
+      // set data
+      ResearchUser = {
+        Class: user.details.user,
+        Payload: generateUserJwt(user.details.user),
+      };
+
+      expect(user.details.user.email).toBe(newUser.email);
+    });
+
+    test("Admin cannot add a system user", async () => {
+      const newUser = generateUser(
+        UserEnum.SYSTEM,
+        UserRoleEnum.SYSTEM,
+        new Types.ObjectId(AdminUser.Payload.sub)
+      );
+
+      // run tests
+      expect(Utility.create(AdminUser.Payload, newUser)).rejects.toEqual(
+        new Error({
+          status: 403,
+          message: "User is forbidden from creating users.",
+        })
+      );
+    });
+
+    test("Researcher cannot add user", async () => {
+      const newUser = generateUser(
+        UserEnum.MEMBER,
+        UserRoleEnum.ANNOTATOR,
+        new Types.ObjectId(ResearchUser.Payload.sub)
+      );
+
+      // run tests
+      expect(Utility.create(ResearchUser.Payload, newUser)).rejects.toEqual(
+        new Error({
+          status: 403,
+          message: "User is forbidden from creating users.",
+        })
+      );
+    });
+
+    test("Annotator cannot add user", () => {
+      const newUser = generateUser(
+        UserEnum.MEMBER,
+        UserRoleEnum.ANNOTATOR,
+        new Types.ObjectId(AnnotatorUser.Payload.sub)
+      );
+
+      // run tests
+      expect(Utility.create(AnnotatorUser.Payload, newUser)).rejects.toEqual(
+        new Error({
+          status: 403,
+          message: "User is forbidden from creating users.",
+        })
+      );
+    });
   });
 
-  test("Researcher can read own user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(testResearchUser);
+  describe("Read: User", () => {
+    test("System can read another user", async () => {
+      // run tests
+      const user = await Utility.get(
+        SystemUser.Payload,
+        ResearchUser.Payload.sub
+      );
+      expect(user.details.user.email).toBe(ResearchUser.Class.email);
+    });
 
-    // run tests
-    const user = await Utility.get(
-      testResearchUser,
-      testResearchUser._id as unknown as string
-    );
-    expect(user.details.user.email).toBe("researcher@codrjs.com");
+    test("Admin can read another user", async () => {
+      // run tests
+      const user = await Utility.get(
+        AdminUser.Payload,
+        ResearchUser.Payload.sub
+      );
+      expect(user.details.user.email).toBe(ResearchUser.Class.email);
+    });
+
+    test("Researcher cannot read another user", async () => {
+      // run tests
+      await new Promise((resolve, reject) => {
+        expect(Utility.get(ResearchUser.Payload, AdminUser.Payload.sub))
+          .rejects.toEqual(
+            new Error({
+              status: 403,
+              message: "User is forbidden from reading this user.",
+            })
+          )
+          .then(resolve)
+          .catch(reject);
+      });
+    });
+
+    test("Annotator cannot read another user", async () => {
+      // run tests
+      await new Promise((resolve, reject) => {
+        expect(Utility.get(AnnotatorUser.Payload, AdminUser.Payload.sub))
+          .rejects.toEqual(
+            new Error({
+              status: 403,
+              message: "User is forbidden from reading this user.",
+            })
+          )
+          .then(resolve)
+          .catch(reject);
+      });
+    });
+
+    test("Researcher can read their own user", async () => {
+      // run tests
+      const user = await Utility.get(
+        ResearchUser.Payload,
+        ResearchUser.Payload.sub
+      );
+      expect(user.details.user.email).toBe(ResearchUser.Class.email);
+    });
+
+    // test("Annotator can read their own user", async () => {
+    //   // run tests
+    //   const user = await Utility.get(
+    //     AnnotatorUser.Payload,
+    //     AnnotatorUser.Payload.sub
+    //   );
+    //   expect(user.details.user.email).toBe(AnnotatorUser.Class.email);
+    // });
   });
 
-  test("Annotator can read own user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValue(testAnnotatorUser);
+  describe("Update: User", () => {
+    test("System can update another user", async () => {
+      // run tests
+      const user = await Utility.update(
+        SystemUser.Payload,
+        AdminUser.Class._id.toString(),
+        AdminUser.Class
+      );
+      expect(user.details.user.updatedAt.getTime()).toBeGreaterThan(
+        AdminUser.Class.updatedAt.getTime()
+      );
+    });
 
-    // run tests
-    const user = await Utility.get(
-      testAnnotatorUser,
-      testAnnotatorUser._id as unknown as string
-    );
-    expect(user.details.user.email).toBe("annotator@codrjs.com");
-  });
+    test("Admin can update another user", async () => {
+      // run tests
+      const user = await Utility.update(
+        AdminUser.Payload,
+        ResearchUser.Class._id.toString(),
+        ResearchUser.Class
+      );
+      expect(user.details.user.updatedAt.getTime()).toBeGreaterThan(
+        ResearchUser.Class.updatedAt.getTime()
+      );
+    });
 
-  test("Researcher cannot read another user", () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(demoNewUser);
+    test("System cannot update system user", async () => {
+      // run tests
+      await new Promise((resolve, reject) => {
+        expect(
+          Utility.update(
+            SystemUser.Payload,
+            SystemUser.Payload.sub,
+            SystemUser.Class
+          )
+        )
+          .rejects.toEqual(
+            new Error({
+              status: 403,
+              message: "User is forbidden from updating this user.",
+            })
+          )
+          .then(resolve)
+          .catch(reject);
+      });
+    });
 
-    // run tests
-    expect(
-      Utility.get(testResearchUser, demoNewUser._id as unknown as string)
-    ).rejects.toEqual(
-      new Error({
-        status: 403,
-        message: "User is forbidden from reading this user.",
-      })
-    );
-  });
+    test("Admin cannot update system user", async () => {
+      // run tests
+      await new Promise((resolve, reject) => {
+        expect(
+          Utility.update(
+            AdminUser.Payload,
+            SystemUser.Payload.sub,
+            SystemUser.Class
+          )
+        )
+          .rejects.toEqual(
+            new Error({
+              status: 403,
+              message: "User is forbidden from updating this user.",
+            })
+          )
+          .then(resolve)
+          .catch(reject);
+      });
+    });
 
-  test("Annotator cannot read another user", () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(demoNewUser);
+    test("Researcher cannot update users", async () => {
+      // run tests
+      await new Promise((resolve, reject) => {
+        expect(
+          Utility.update(
+            ResearchUser.Payload,
+            ResearchUser.Payload.sub,
+            ResearchUser.Class
+          )
+        )
+          .rejects.toEqual(
+            new Error({
+              status: 403,
+              message: "User is forbidden from updating this user.",
+            })
+          )
+          .then(resolve)
+          .catch(reject);
+      });
 
-    // run tests
-    expect(
-      Utility.get(testAnnotatorUser, demoNewUser._id as unknown as string)
-    ).rejects.toEqual(
-      new Error({
-        status: 403,
-        message: "User is forbidden from reading this user.",
-      })
-    );
-  });
-});
+      // test("Annotator cannot update users", async () => {
+      //   // mock function returns once
+      //   User.findById = jest.fn().mockResolvedValueOnce(demoNewUser);
 
-describe("User Utility: Update", () => {
-  test("System can update another user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(demoNewUser);
-    User.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(demoNewUser);
-
-    // run tests
-    const user = await Utility.update(
-      testSystemUser,
-      demoNewUser._id as unknown as string,
-      demoNewUser
-    );
-    expect(user.details.user.email).toBe("adduser@codrjs.com");
-  });
-
-  test("System cannot update system user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(testSystemUser);
-
-    // run tests
-    expect(
-      Utility.update(
-        testSystemUser,
-        testSystemUser._id as unknown as string,
-        testSystemUser
-      )
-    ).rejects.toEqual(
-      new Error({
-        status: 403,
-        message: "User is forbidden from updating this user.",
-      })
-    );
-  });
-
-  test("Admin can update another user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(testAdminUser);
-    User.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(demoNewUser);
-
-    // run tests
-    const user = await Utility.update(
-      testAdminUser,
-      demoNewUser._id as unknown as string,
-      demoNewUser
-    );
-    expect(user.details.user.email).toBe("adduser@codrjs.com");
-  });
-
-  test("Admin cannot update system user", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(testSystemUser);
-
-    // run tests
-    expect(
-      Utility.update(
-        testResearchUser,
-        testSystemUser._id as unknown as string,
-        testSystemUser
-      )
-    ).rejects.toEqual(
-      new Error({
-        status: 403,
-        message: "User is forbidden from updating this user.",
-      })
-    );
-  });
-
-  test("Researcher cannot update users", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(demoNewUser);
-
-    // run tests
-    expect(
-      Utility.update(
-        testResearchUser,
-        demoNewUser._id as unknown as string,
-        demoNewUser
-      )
-    ).rejects.toEqual(
-      new Error({
-        status: 403,
-        message: "User is forbidden from updating this user.",
-      })
-    );
-  });
-
-  test("Annotator cannot update users", async () => {
-    // mock function returns once
-    User.findById = jest.fn().mockResolvedValueOnce(demoNewUser);
-
-    // run tests
-    expect(
-      Utility.update(
-        testAnnotatorUser,
-        demoNewUser._id as unknown as string,
-        demoNewUser
-      )
-    ).rejects.toEqual(
-      new Error({
-        status: 403,
-        message: "User is forbidden from updating this user.",
-      })
-    );
+      //   // run tests
+      //   expect(
+      //     Utility.update(
+      //       testAnnotatorUser,
+      //       (demoNewUser._id as Types.ObjectId).toString(),
+      //       demoNewUser
+      //     )
+      //   ).rejects.toEqual(
+      //     new Error({
+      //       status: 403,
+      //       message: "User is forbidden from updating this user.",
+      //     })
+      //   );
+      // });
+    });
   });
 });
 

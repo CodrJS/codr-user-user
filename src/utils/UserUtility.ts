@@ -1,14 +1,25 @@
-import { subject } from "@casl/ability";
-import { User, IUser, Utility, Error, Response } from "@codrjs/models";
-import MongoUser, { UserDocument } from "../entities/User";
-import UserAbility from "../entities/User.ability";
+import { User, IUser, Utility, Error, Response, Types } from "@codrjs/models";
+import { Abilities, Documents } from "@codrjs/mongo";
+import Mongo from "./Mongo";
+
+// define types
+type Document = Documents.UserDocument;
+type JwtPayload = Types.JwtPayload;
 
 export class UserUtility extends Utility {
+  private User;
+
+  constructor() {
+    super();
+    this.User = Mongo.User.User;
+  }
+
   // an internal method for getting the desired document to check against permissions
   protected async _getDocument<T>(id: string) {
     try {
-      return (await MongoUser.findById(id)) as T;
+      return (await this.User.findById(id)) as T;
     } catch (err) {
+      console.log(err);
       throw new Error({
         status: 500,
         message: "Something went wrong when fetching user",
@@ -22,7 +33,7 @@ export class UserUtility extends Utility {
 
   private async _getDocumentByEmail<T>(email: string) {
     try {
-      return (await MongoUser.findOne({ email })) as T;
+      return (await this.User.findOne({ email })) as T;
     } catch (err) {
       throw new Error({
         status: 500,
@@ -35,12 +46,12 @@ export class UserUtility extends Utility {
     }
   }
 
-  async get(token: IUser, id: string) {
+  async get(token: JwtPayload, id: string) {
     // get desired user document
-    const user = await this._getDocument<UserDocument>(id);
+    const user = new User(await this._getDocument<Document>(id));
 
     // if user and read the document, send it, else throw error
-    if (UserAbility(token).can("read", subject("User", user))) {
+    if (Abilities.UserAbility(token).can("read", user)) {
       return new Response({
         message: "OK",
         details: {
@@ -55,9 +66,15 @@ export class UserUtility extends Utility {
     }
   }
 
+  /**
+   * This method searches the database for a user by email address
+   * @param email Email address of desired user
+   * @returns response containing user object
+   * @dangerous USE ONLY FOR ACCOUNT LOOKUP FOR AUTH SERVICE
+   */
   async getByEmail(email: string) {
     // get desired user document
-    return await this._getDocumentByEmail<UserDocument>(email).then(user => {
+    return await this._getDocumentByEmail<Document>(email).then(user => {
       return new Response({
         message: "OK",
         details: {
@@ -67,12 +84,12 @@ export class UserUtility extends Utility {
     });
   }
 
-  async create(token: IUser, obj: IUser) {
+  async create(token: JwtPayload, obj: User) {
     // if user can create users
-    if (UserAbility(token).can("create", "User")) {
+    if (Abilities.UserAbility(token).can("create", obj)) {
       try {
         // create user
-        const user = await MongoUser.create(obj);
+        const user = await this.User.create(obj.toJSON());
         return new Response({
           message: "OK",
           details: {
@@ -94,23 +111,23 @@ export class UserUtility extends Utility {
     }
   }
 
-  async update(token: IUser, id: string, obj: Partial<IUser>) {
+  async update(token: JwtPayload, id: string, obj: Partial<IUser>) {
     // get desired user document
-    const user = await this._getDocument<UserDocument>(id);
+    const user = new User(await this._getDocument<Document>(id));
 
     // check permissions
-    if (UserAbility(token).can("update", subject("User", user))) {
+    if (Abilities.UserAbility(token).can("update", user)) {
       try {
         // update user.
-        const user = (await MongoUser.findByIdAndUpdate(id, obj, {
+        const updatedUser = (await this.User.findByIdAndUpdate(id, obj, {
           returnDocument: "after",
-        })) as UserDocument;
+        })) as Document;
 
         // return true if succeeded, else throw error
         return new Response({
           message: "OK",
           details: {
-            user: new User(user),
+            user: new User(updatedUser),
           },
         });
       } catch (e) {
@@ -131,7 +148,7 @@ export class UserUtility extends Utility {
   /**
    * @todo Hard or soft delete users?
    */
-  async delete(token: IUser, id: string) {
+  async delete(token: JwtPayload, id: string) {
     throw new Error({
       status: 500,
       message: "Method not implemented.",
