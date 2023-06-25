@@ -44,7 +44,6 @@ const generateUserJwt = (user: User) => {
 describe("User Utility", () => {
   let Utility: UserUtility;
   let SystemUser: {
-    Document: Documents.UserDocument;
     Class: User;
     Payload: CodrTypes.JwtPayload;
   };
@@ -69,13 +68,13 @@ describe("User Utility", () => {
     Utility = new UserUtility();
 
     // get user document
-    const doc = (await MongoUser.findOne({
-      email: "system@codrjs.com",
-    })) as Documents.UserDocument;
-    const Class = new User(doc);
+    const Class = new User(
+      (await MongoUser.findOne({
+        email: "system@codrjs.com",
+      })) as Documents.UserDocument
+    );
 
     SystemUser = {
-      Document: doc,
       Class,
       Payload: generateUserJwt(Class),
     };

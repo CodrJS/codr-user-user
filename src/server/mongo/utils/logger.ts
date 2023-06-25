@@ -10,4 +10,5 @@ const MongoLogger = Logger.add("Mongo", [
     level: "error",
   }),
 ]);
+
 export default MongoLogger;

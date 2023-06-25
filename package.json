@@ -1,8 +1,7 @@
 {
   "name": "codr-user-user",
   "private": true,
-  "version": "1.0.3",
-  "type": "module",
+  "version": "1.0.4",
   "scripts": {
     "start": "node dist/serve.js",
     "build": "swc ./src -d dist",
